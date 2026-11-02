@@ -23,6 +23,12 @@
   <a href="https://github.com/zerob13/dsh-better-markdown/blob/master/README.md">中文</a> · <a href="https://github.com/zerob13/dsh-better-markdown/blob/master/README_EN.md"><b>English</b></a>
 </p>
 
+This is a fork of [zerob13/dsh-better-markdown](https://github.com/zerob13/dsh-better-markdown). Install the prebuilt tarball from this fork's GitHub Releases using DSH's plugin manager. The npm commands below install the upstream version. The original package name is retained for DSH registration; `private` prevents accidental npm publication.
+
+This fork renders settled Mermaid fences as images, preserving YAML frontmatter and supporting theme changes and source toggling. The upstream fullscreen, zoom and export controls are replaced by this simpler preview. Mermaid image nodes are rejected before layout so a slow image cannot block later diagrams. Ordinary Markdown images retain upstream loading behavior.
+
+Settled SVG fences display an image preview and the original code. SVG fragments without `xmlns` are normalized; invalid XML, DOCTYPE and oversized input retain source only. Isolated Chromium tests cover basic rendering, frontmatter, SVG fragments, a script/external-image sample and queue recovery after image rejection. They do not establish installation compatibility with the current DSH page or cover every browser and resource-exhaustion scenario.
+
 `dsh-better-markdown` is a DeepSeek Harness Web client plugin. Once installed, every assistant Markdown block carrying streaming state is parsed and rendered by `markstream-react`. The same renderer stays mounted after the stream settles, so completion does not swap the message back to a different Markdown implementation.
 
 > `markstream-react` is the official React package from the [`Simon-He95/markstream-vue`](https://github.com/Simon-He95/markstream-vue) monorepo. This plugin does not add the Vue runtime to Harness.

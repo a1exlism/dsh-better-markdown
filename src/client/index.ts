@@ -4,6 +4,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { removeCustomComponents, setCustomComponents } from 'markstream-react'
 import 'markstream-react/index.css'
 import './styles.css'
+import { DshMermaidNode } from './mermaid.tsx'
 import {
   BetterAssistantNodeView,
   DshCodeBlockNode,
@@ -24,6 +25,7 @@ export const inject = ['slots']
 export function apply(ctx: Context): void {
   ctx.effect(() => {
     setCustomComponents(CUSTOM_COMPONENT_SCOPE, {
+      mermaid: DshMermaidNode,
       code_block: DshCodeBlockNode,
       image: DshImageNode,
       inline_code: DshInlineCodeNode,

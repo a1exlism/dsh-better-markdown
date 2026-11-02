@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   npm:
-    if: ${{ !github.event.release.prerelease }}
+    if: ${{ github.repository == 'zerob13/dsh-better-markdown' && !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
