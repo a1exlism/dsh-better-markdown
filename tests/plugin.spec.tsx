@@ -108,8 +108,26 @@ describe('browser plugin', () => {
         streaming={false}
       />,
     )
-    expect(view.container.querySelector('[data-markstream-mermaid="1"]')).not.toBeNull()
+    expect(view.container.querySelector('[data-dsh-mermaid]')).not.toBeNull()
     expect(view.container.querySelector('.md-code-block')).toBeNull()
+    plugin.dispose()
+  })
+
+  it('previews settled SVG fences in an image context', () => {
+    const plugin = mountPlugin()
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4"/></svg>'
+    const text = `\`\`\`svg\n${svg}\n\`\`\``
+    const view = render(<MarkstreamMarkdown text={text} streaming />)
+    expect(view.container.querySelector('img[alt="SVG preview"]')).toBeNull()
+    view.rerender(<MarkstreamMarkdown text={text} streaming={false} />)
+    const image = view.container.querySelector('img[alt="SVG preview"]')
+    expect(image?.getAttribute('src')).toBe(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg + '\n')}`)
+    expect(view.container.querySelector('.code-block-container')).not.toBeNull()
+    view.rerender(<MarkstreamMarkdown text={'```svg\n<svg viewBox="0 0 10 10"><circle r="4"/></svg>\n```'} streaming={false} />)
+    const fragment = view.container.querySelector('img[alt="SVG preview"]')?.getAttribute('src') ?? ''
+    expect(decodeURIComponent(fragment)).toContain('xmlns="http://www.w3.org/2000/svg"')
+    view.rerender(<MarkstreamMarkdown text={'```svg\n<!DOCTYPE svg><svg xmlns="http://www.w3.org/2000/svg"/>\n```'} streaming={false} />)
+    expect(view.container.querySelector('img[alt="SVG preview"]')).toBeNull()
     plugin.dispose()
   })
 

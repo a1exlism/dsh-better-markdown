@@ -23,6 +23,14 @@
   <a href="https://github.com/zerob13/dsh-better-markdown/blob/master/README.md"><b>中文</b></a> · <a href="https://github.com/zerob13/dsh-better-markdown/blob/master/README_EN.md">English</a>
 </p>
 
+本仓库是 [zerob13/dsh-better-markdown](https://github.com/zerob13/dsh-better-markdown) 的 fork。优化版本通过本仓库的 GitHub Release 分发预构建 tarball；下文 npm 安装命令指向原作者版本，不能用于安装此 fork。下载 Release 附件后，使用 DSH 插件管理器安装该本地 tarball。包名保留以兼容 DSH 注册，设置 `private` 防止误发布到原 npm 包名。
+
+本 fork 的 Mermaid 在围栏结束后生成图片模式预览，支持 YAML frontmatter、主题和源码切换；不再使用上游 Mermaid 组件的全屏、缩放与导出控件。Mermaid 图片节点在布局前拒绝并保留源码，避免外部图片请求阻塞后续图表。普通 Markdown 外部图片仍按原策略加载，并非断网模式。
+
+`svg` 围栏在结束后显示图片预览和原始源码，支持省略 `xmlns` 的 SVG 片段；无效 XML、DOCTYPE 和超出长度上限的输入保留源码。预览在浏览器图片上下文运行，不把 SVG 注入宿主页面 DOM。
+
+隔离 Chromium 回归已验证普通 Mermaid、frontmatter、SVG 片段、SVG 脚本与外链样例、图片节点拒绝及后续图表恢复。该验证不等同于当前 DSH 页面安装验收，也不覆盖所有浏览器或复杂图形的资源消耗。
+
 `dsh-better-markdown` 是一个 DeepSeek Harness Web 客户端插件。安装后，Web 对话中所有带流式状态的 assistant Markdown 都由 `markstream-react` 解析和渲染；同一消息流结束后继续使用同一个 renderer，不会在完成瞬间切回另一套 Markdown 实现。
 
 > `markstream-react` 是 [`Simon-He95/markstream-vue`](https://github.com/Simon-He95/markstream-vue) monorepo 提供的 React 版本。本插件在 Harness 中使用的是 React package，不会引入 Vue runtime。

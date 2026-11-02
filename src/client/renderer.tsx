@@ -80,15 +80,33 @@ export function DshInlineCodeNode({ node, ctx }: NodeComponentProps<InlineCodeNo
 
 /** Use Markstream's worker-free Shiki renderer for fenced code blocks. */
 export function DshCodeBlockNode({ node, ctx }: NodeComponentProps<CodeBlockNode>) {
+  const svg = useMemo(() => {
+    if (node.language?.toLowerCase() !== 'svg' || node.loading || ctx?.codeBlockStream || node.code.length > 100_000 || /<!doctype/i.test(node.code)) return undefined
+    try {
+      const doc = new DOMParser().parseFromString(node.code, 'image/svg+xml')
+      if (doc.querySelector('parsererror') || doc.documentElement.localName !== 'svg') return undefined
+      const namespace = doc.documentElement.namespaceURI
+      if (namespace !== null && namespace !== 'http://www.w3.org/2000/svg') return undefined
+      if (namespace === null) doc.documentElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+      const source = namespace === null ? new XMLSerializer().serializeToString(doc.documentElement) : node.code
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(source)}`
+    } catch {
+      return undefined
+    }
+  }, [node.language, node.loading, node.code, ctx?.codeBlockStream])
   return (
-    <MarkdownCodeBlockNode
-      node={node}
-      loading={node.loading}
-      stream={ctx?.codeBlockStream ?? true}
-      isDark={ctx?.isDark ?? false}
-      langs={SHIKI_LANGUAGES}
-      onCopy={ctx?.events.onCopy}
-    />
+    <>
+      {svg !== undefined && <img className="dsh-better-markdown__svg" src={svg} alt="SVG preview" />}
+      <MarkdownCodeBlockNode
+        node={node}
+        loading={node.loading}
+        stream={ctx?.codeBlockStream ?? true}
+        isDark={ctx?.isDark ?? false}
+        langs={SHIKI_LANGUAGES}
+        onCopy={ctx?.events.onCopy}
+        showPreviewButton={node.language?.toLowerCase() !== 'svg'}
+      />
+    </>
   )
 }
 

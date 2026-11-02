@@ -1,16 +1,17 @@
 {
   "name": "dsh-better-markdown",
-  "version": "0.1.2",
+  "version": "0.1.3",
+  "private": true,
   "description": "DeepSeek Harness Web plugin that renders streamed assistant Markdown with markstream-react.",
   "packageManager": "pnpm@10.33.3",
   "author": "duskzhen",
-  "homepage": "https://github.com/zerob13/dsh-better-markdown#readme",
+  "homepage": "https://github.com/a1exlism/dsh-better-markdown#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zerob13/dsh-better-markdown.git"
+    "url": "git+https://github.com/a1exlism/dsh-better-markdown.git"
   },
   "bugs": {
-    "url": "https://github.com/zerob13/dsh-better-markdown/issues"
+    "url": "https://github.com/a1exlism/dsh-better-markdown/issues"
   },
   "publishConfig": {
     "access": "public",
@@ -25,6 +26,8 @@
       "default": "./lib/index.js"
     },
     "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
     "./package.json": "./package.json"
   },
   "files": [
@@ -33,6 +36,8 @@
     "lib/client.js",
     "lib/client.js.map",
     "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
     "README.md",
     "LICENSE"
   ],
