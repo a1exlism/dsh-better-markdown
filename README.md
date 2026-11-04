@@ -25,6 +25,10 @@
 
 本仓库是 [zerob13/dsh-better-markdown](https://github.com/zerob13/dsh-better-markdown) 的 fork。优化版本通过本仓库的 GitHub Release 分发预构建 tarball；下文 npm 安装命令指向原作者版本，不能用于安装此 fork。下载 Release 附件后，使用 DSH 插件管理器安装该本地 tarball。包名保留以兼容 DSH 注册，设置 `private` 防止误发布到原 npm 包名。
 
+`0.1.5` 修复 DSH `0.2.2` 中助手条目缺少文件引用注入而崩溃、回退到内置渲染器的问题：条目声明并渲染思考正文与图片子槽，按会话注入文件引用解析器，缺少可选服务时继续显示正文，保留旧宿主参数及 `priority: -100`。
+
+> 验证：接口已按官方 `dsh-v0.2.2-alpha.3` 源码核对；用户已在其 DSH `0.2.2` 目标设备确认候选包能够正常渲染。该结果不代表所有预发布构建或浏览器均已验证。
+
 本 fork 的 Mermaid 在围栏结束后生成图片模式预览，支持 YAML frontmatter、主题和源码切换；不再使用上游 Mermaid 组件的全屏、缩放与导出控件。Mermaid 图片节点在布局前拒绝并保留源码，避免外部图片请求阻塞后续图表。普通 Markdown 外部图片仍按原策略加载，并非断网模式。
 
 `svg` 围栏在结束后显示图片预览和原始源码，支持省略 `xmlns` 的 SVG 片段；无效 XML、DOCTYPE 和超出长度上限的输入保留源码。预览在浏览器图片上下文运行，不把 SVG 注入宿主页面 DOM。
