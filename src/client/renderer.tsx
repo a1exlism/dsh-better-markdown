@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import MarkdownRender, { MarkdownCodeBlockNode } from 'markstream-react'
 import type { NodeComponentProps } from 'markstream-react'
 import type { CodeBlockNode, ImageNode, InlineCodeNode, LinkNode } from 'stream-markdown-parser'
-import { DisclosureRow, IconThinkOutline14, JsonBlock } from '@deepseek-ai/dsh-client-ui-primitives'
+import { DisclosureRow, JsonBlock } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { MarkdownFileMentions } from '@deepseek-ai/dsh-client-ui-primitives'
 import { ImageGallery } from '@deepseek-ai/dsh-client-ui-attachment'
 import type { ImageLoader } from '@deepseek-ai/dsh-client-ui-attachment'
@@ -222,7 +222,7 @@ function ReasoningRow({ text, running, t }: {
         leadingClassName="dsh-better-markdown__reasoning-leading"
         titleClassName="dsh-better-markdown__reasoning-title"
         chevronClassName="dsh-better-markdown__reasoning-chevron"
-        icon={<IconThinkOutline14 size={14} />}
+        icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M9 18h6m-5 3h4M8 14c-4-5-1-11 4-11s8 6 4 11l-1 2H9z" /></svg>}
         title="Think"
         open={expanded}
         expandable

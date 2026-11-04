@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { removeCustomComponents } from 'markstream-react'
 import { apply } from '../src/client/index.ts'
-import { MarkstreamMarkdown } from '../src/client/renderer.tsx'
+import { BetterAssistantNodeView, MarkstreamMarkdown } from '../src/client/renderer.tsx'
 
 function mountPlugin() {
   const register = vi.fn(() => () => {})
@@ -29,6 +29,18 @@ afterEach(() => {
 })
 
 describe('browser plugin', () => {
+  it('renders reasoning with a plugin-owned icon', () => {
+    const props = {
+      node: { data: { blocks: [{ kind: 'reasoning', text: 'Thinking' }], status: 'completed' }, location: { kind: 'unknown' } },
+      useTurnData: () => undefined,
+      openFile: vi.fn(),
+      fileMentions: () => undefined,
+      t: (key: string) => key,
+    }
+    const view = render(<BetterAssistantNodeView {...props as unknown as React.ComponentProps<typeof BetterAssistantNodeView>} />)
+    expect(view.container.querySelector('svg')).not.toBeNull()
+    expect(view.container.textContent).toContain('Think')
+  })
   it('shadows the built-in assistant renderer and leaves it as fallback', () => {
     const plugin = mountPlugin()
     expect(plugin.slots.inject).toHaveBeenCalledWith('conversation.chat.node', expect.any(Function))
