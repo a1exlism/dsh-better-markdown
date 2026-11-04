@@ -25,6 +25,10 @@
 
 This is a fork of [zerob13/dsh-better-markdown](https://github.com/zerob13/dsh-better-markdown). Install the prebuilt tarball from this fork's GitHub Releases using DSH's plugin manager. The npm commands below install the upstream version. The original package name is retained for DSH registration; `private` prevents accidental npm publication.
 
+Version `0.1.5` fixes an assistant entry crash on DSH `0.2.2` when the host no longer supplies the entry's file-mention reader. The plugin declares and renders its reasoning and image child slots, injects a session-bound file reader, tolerates an absent optional provider, and retains legacy host props and priority `-100`.
+
+The interfaces were checked against official tag `dsh-v0.2.2-alpha.3`. The user confirmed that the candidate renders correctly on their DSH `0.2.2` target device; other prerelease builds and browsers have not all been verified.
+
 This fork renders settled Mermaid fences as images, preserving YAML frontmatter and supporting theme changes and source toggling. The upstream fullscreen, zoom and export controls are replaced by this simpler preview. Mermaid image nodes are rejected before layout so a slow image cannot block later diagrams. Ordinary Markdown images retain upstream loading behavior.
 
 Settled SVG fences display an image preview and the original code. SVG fragments without `xmlns` are normalized; invalid XML, DOCTYPE and oversized input retain source only. Isolated Chromium tests cover basic rendering, frontmatter, SVG fragments, a script/external-image sample and queue recovery after image rejection. They do not establish installation compatibility with the current DSH page or cover every browser and resource-exhaustion scenario.

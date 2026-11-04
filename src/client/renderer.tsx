@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, memo, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import MarkdownRender, { MarkdownCodeBlockNode } from 'markstream-react'
 import type { NodeComponentProps } from 'markstream-react'
@@ -202,10 +202,11 @@ function latestLine(text: string): string {
   return newline === -1 ? visible : visible.slice(newline + 1)
 }
 
-function ReasoningRow({ text, running, t }: {
+function ReasoningRow({ text, running, t, renderSlot }: {
   text: string
   running: boolean
   t: ChatViewSlotProps['t']
+  renderSlot?: AssistantSlots['renderSlot'] | undefined
 }) {
   const [expanded, setExpanded] = useState(false)
   const summaryRef = useRef<HTMLSpanElement>(null)
@@ -235,7 +236,7 @@ function ReasoningRow({ text, running, t }: {
           </>
         )}
       >
-        <div className="dsh-better-markdown__reasoning-body">{text}</div>
+        <div className="dsh-better-markdown__reasoning-body">{renderSlot ? renderSlot('conversation.chat.reasoning.body', { text, rawText: text, running }, { fallback: text }) : text}</div>
       </DisclosureRow>
     </div>
   )
@@ -243,12 +244,14 @@ function ReasoningRow({ text, running, t }: {
 
 type AssistantBlock = AssistantChatData['blocks'][number]
 
-function BetterAssistantMarkdown({ blocks, streaming, interrupted, loadImage, mentions, t }: {
+function BetterAssistantMarkdown({ blocks, streaming, interrupted, loadImage, mentions, renderSlot, groupPart, t }: {
   blocks: readonly AssistantBlock[]
   streaming: boolean
   interrupted?: boolean | undefined
   loadImage?: ImageLoader | undefined
   mentions?: MarkdownFileMentions | undefined
+  renderSlot?: AssistantSlots['renderSlot'] | undefined
+  groupPart?: string | undefined
   t: ChatViewSlotProps['t']
 }) {
   const imageLoader = loadImage ?? (() => Promise.reject(new Error(t('image.serviceUnavailable'))))
@@ -259,6 +262,8 @@ function BetterAssistantMarkdown({ blocks, streaming, interrupted, loadImage, me
   for (let index = 0; index < blocks.length; index += 1) {
     const block = blocks[index]
     if (block === undefined) continue
+    if (groupPart === 'reasoning' && block.kind !== 'reasoning') continue
+    if (groupPart === 'response' && block.kind === 'reasoning') continue
     switch (block.kind) {
       case 'text':
         rendered.push(
@@ -266,7 +271,7 @@ function BetterAssistantMarkdown({ blocks, streaming, interrupted, loadImage, me
         )
         break
       case 'reasoning':
-        rendered.push(<ReasoningRow key={index} text={block.text} running={streaming && index === last} t={t} />)
+        rendered.push(<ReasoningRow key={index} text={block.text} running={streaming && index === last} t={t} renderSlot={renderSlot} />)
         break
       case 'image': {
         const start = index
@@ -276,6 +281,14 @@ function BetterAssistantMarkdown({ blocks, streaming, interrupted, loadImage, me
           if (next === undefined || next.kind !== 'image') break
           group.push(next)
           index += 1
+        }
+        if (renderSlot) {
+          rendered.push(<Fragment key={start}>{renderSlot('conversation.chat.message.images', {
+            images: group.map(({ attachment }) => ({ attachment })),
+            loadImage,
+            align: 'start',
+          })}</Fragment>)
+          break
         }
         rendered.push(
           <ImageGallery
@@ -321,10 +334,22 @@ function BetterAssistantMarkdown({ blocks, streaming, interrupted, loadImage, me
   )
 }
 
+type AssistantSlots = {
+  renderSlot: (
+    name: 'conversation.chat.reasoning.body' | 'conversation.chat.message.images',
+    owner: Record<string, unknown>,
+    options?: { fallback: ReactNode },
+  ) => ReactNode
+}
+type AssistantProps = ChatNodeViewProps<'assistant-step'> & Partial<AssistantSlots> & {
+  groupPart?: string | undefined
+  closingFileMentions?: (owner: TurnTailOwnerProps) => MarkdownFileMentions | undefined
+}
+
 /** Streaming, settled, and interrupted assistant states rendered through Markstream. */
 export const BetterAssistantNodeView = memo(function BetterAssistantNodeView({
-  node, useTurnData, openFile, loadImage, fileMentions, t,
-}: ChatNodeViewProps<'assistant-step'>) {
+  node, useTurnData, openFile, loadImage, fileMentions, closingFileMentions, renderSlot, groupPart, t,
+}: AssistantProps) {
   const data = node.data
   const turn = node.location.kind === 'turn' || node.location.kind === 'step'
     ? node.location.turn
@@ -336,8 +361,8 @@ export const BetterAssistantNodeView = memo(function BetterAssistantNodeView({
     return { turn, seq: data.finalNode.seq, openFile }
   }, [data.finalNode, openFile, tail, turn])
   const mentions = useMemo(
-    () => owner === undefined ? undefined : fileMentions(owner),
-    [fileMentions, owner],
+    () => owner === undefined ? undefined : (fileMentions ?? closingFileMentions)?.(owner),
+    [fileMentions, closingFileMentions, owner],
   )
   return (
     <BetterAssistantMarkdown
@@ -346,6 +371,8 @@ export const BetterAssistantNodeView = memo(function BetterAssistantNodeView({
       interrupted={data.status === 'interrupted'}
       loadImage={loadImage}
       mentions={mentions}
+      renderSlot={renderSlot}
+      groupPart={groupPart}
       t={t}
     />
   )
